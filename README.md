@@ -5,7 +5,8 @@ my lessons learned.
 ## Replication  
 Be shure to pass in parameters to RPCs and not use member vars in the body, else RPCs don't work.  
 Unless PlayerCharacter/Pawn/player related code, HasAuthority().  else: Pawn->IsLocallyControlled(), Controller->IsLocalController(), !IsDedicatedServer()
-MulticastRPC doesn't replicate if client doesn't have open channel.
+MulticastRPC doesn't replicate if client doesn't have open channel.  
+Replicated [x] is cheaper than RPC.  Try and avoid RPC when possible.
 
 ### HTF do I
 * have a client update the color of a material on an Character and all clients & server see the change?
