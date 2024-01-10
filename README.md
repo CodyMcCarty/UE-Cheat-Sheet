@@ -1,6 +1,41 @@
 # UE-Cheat-Sheet
 my lessons learned.  
 [Alex Forsythy repo](https://github.com/awforsythe/Repsi/tree/main)  
+[Ari](https://ari.games/), [Ari's Notion](https://flassari.notion.site/Ari-s-Unreal-Engine-Notes-1a75e43f4014464984d4fae0617e5cef)
+
+* lighter version of GetAllActorsOfClass()
+```cpp
+for (AIController* Controller : TActorRange<AShooterAIController>(GetWorld()))
+```
+  
+* HTF do I see changes made in the editor?
+```cpp
+// .h
+UPROPERTY(EdityAnywhere, BlueprintReadWrite)
+float Radius{500.f};
+virtual void PostEditChangeProperty(FpropertyChangedEvent& PropertyChangedEvent) override;
+// attach SomeOtherClass
+// .cpp
+void MyClass::PostEditChangeProperty(FpropertyChangedEvent& PropertyChangedEvent)
+{
+  Super::PostEditChangeProperty(&PropertyChangedEvent) // ?that & could be Rider
+  SomeOtherClass->SetRadius(Radius);
+}
+```
+
+* HTF do I process OnDestroyed while in editor?
+```cpp
+// .h
+virtural void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+// attach SomeOtherClass
+// .cpp
+void MyClass::OnComponentDestroyed(bool bDestroyingHierarchy)
+{
+  Super::OnComponentDestroyed(bool bDestroyingHierarchy);
+  SomeOtherClass->DestroyComponent();
+}
+```
+
 
 ## Replication  
 - Be shure to pass in parameters to RPCs and not use member vars in the body, else RPCs don't work.  
@@ -9,10 +44,10 @@ my lessons learned.
 - Replicated [x] is cheaper than RPC.  Try and avoid RPC when possible.
 
 ### HTF do I
-* have a client update the color of a material on an Character and all clients & server see the change?
-1. PC calls PC.ServerRPCSetCharacterColor(Color, Character).  // that's the way clients talk to the server. I had Characters[] and didn't need to own each Character
-1. Which calls Character.SetColor(Color) w/ Notify or Character->Color = aColor.   
-1. Which calls Character.OnRep_Color() // LinearColor Color is a public member var
+* have a client update the color of a material on an Actor and all clients & server see the change?
+1. PC calls PC.ServerRPCSetSomeActorColor(Color, SomeActor).  // that's the way clients talk to the server.
+1. Which calls SomeActor.SetColor(Color) w/ Notify or SomeActor->Color = aColor.   
+1. Which calls SomeActor.OnRep_Color() // LinearColor Color is a public member var
 1. OnRep_Color() sets the Dynamic_MI.ParameterName  // that's one way the server talks to clients.  lazy comprared to RPC.  if behind HasAuth() then it doesn't run on clients
 Server & clients will see the change, eventually.
 
