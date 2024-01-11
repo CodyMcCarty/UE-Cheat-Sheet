@@ -3,6 +3,9 @@ my lessons learned.
 [Alex Forsythy repo](https://github.com/awforsythe/Repsi/tree/main)  
 [Ari](https://ari.games/), [Ari's Notion](https://flassari.notion.site/Ari-s-Unreal-Engine-Notes-1a75e43f4014464984d4fae0617e5cef)
 
+* HTF do I drag select Actors in the eidtor?  
+Ctrl + Alt + Left Mouse Button
+
 * lighter version of GetAllActorsOfClass()
 ```cpp
 for (AIController* Controller : TActorRange<AShooterAIController>(GetWorld()))
