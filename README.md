@@ -41,10 +41,11 @@ void MyClass::OnComponentDestroyed(bool bDestroyingHierarchy)
 
 
 ## Replication  
-- Be shure to pass in parameters to RPCs and not use member vars in the body, else RPCs don't work.  
+- Be shure to pass in parameters to RPCs and not use member vars in the body, else RPCs don't work.  Addtionally, pass in small classes  
 - Unless PlayerCharacter/Pawn/player related code, HasAuthority().  else: Pawn->IsLocallyControlled(), Controller->IsLocalController(), !IsDedicatedServer()  
 - MulticastRPC doesn't replicate if client doesn't have open channel.  
 - Replicated [x] is cheaper than RPC.  Try and avoid RPC when possible.
+- Only the server can set owner of non-owned Actors // TODO try making the owner OnRep
 
 ### HTF do I
 * have a client update the color of a material on an Actor and all clients & server see the change?
@@ -53,6 +54,12 @@ void MyClass::OnComponentDestroyed(bool bDestroyingHierarchy)
 1. Which calls SomeActor.OnRep_Color() // LinearColor Color is a public member var
 1. OnRep_Color() sets the Dynamic_MI.ParameterName  // that's one way the server talks to clients.  lazy comprared to RPC.  if behind HasAuth() then it doesn't run on clients
 Server & clients will see the change, eventually.
+
+* Player Change var on MyComp
+1. //PC// ifHasAuth MyComp.SetVarW/Notify() else Server_SetVar(TargetComp) { MyComp.SetVarW/Notify() }
+2. //MyComp// OnRep_Var // after server calls, then clients call.  HasAuth will divide logic
+3. Treat OnRep_Var as a setter, handle setter logic (log, validation, dispatcher, return).  Can be used to set more complicated ie pass color, set color Dynamic MI_ durring OnRep_Color
+Alternativly, //PC// Server_SetVar(TargetComp).  In my testing it seems faster.
 
 ### Notes until I make my own
 
